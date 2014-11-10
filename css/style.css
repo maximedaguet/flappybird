@@ -17,20 +17,72 @@ body {
     color: #000;
 }
 
-a{
-	color: #000;
-	text-decoration: none;
+#game {
+    width: 480px;
+    height: 640px;
+    background : url('../img/background.png');
+    background-size: 100% 85%;
+    position: relative;
 }
 
-h1{
-	font-size: 1.5em;
+#bird {
+    background : url('../img/bird.png') no-repeat;
+    background-size: cover;
+    position: absolute;
 }
 
-h2{
-	font-size: 1.3125em;
+#restart {
+    background : url('../img/restart.png') no-repeat;
+    background-size: cover;
+    width: 107px;
+    height: 37.5px;
+    position: absolute;
+    top: 250px;
+    left: 186.5px;
+    display: none;
 }
 
-p{
-	font-size: 1em;
+.animated-wings {
+    -webkit-animation: animBird 300ms steps(4) infinite;
+   animation: animBird 300ms steps(4) infinite;
 }
 
+.pipe-top {
+    background : url('../img/pipe_top.png');
+    background-size: cover;
+}
+
+.pipe-bottom {
+    background : url('../img/pipe_bottom.png');
+    background-size: cover;
+}
+
+
+#ground {
+    background : url('../img/ground.png');
+    background-position: top left;
+    height: 15%;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+
+@-webkit-keyframes animBird {
+   from { background-position: 0px 0px; }
+   to { background-position: 0px -96px; }
+}
+@-moz-keyframes animBird {
+   from { background-position: 0px 0px; }
+   to { background-position: 0px -96px; }
+}
+@-o-keyframes animBird {
+   from { background-position: 0px 0px; }
+   to { background-position: 0px -96px; }
+}
+@keyframes animBird {
+   from { background-position: 0px 0px; }
+   to { background-position: 0px -96px; }
+}
