@@ -23,6 +23,7 @@ body {
     background : url('../img/background.png');
     background-size: 100% 85%;
     position: relative;
+    overflow: hidden;
 }
 
 #bird {
@@ -48,13 +49,17 @@ body {
 }
 
 .pipe-top {
-    background : url('../img/pipe_top.png');
+    background : url('../img/pipe_top.png') bottom;
     background-size: cover;
+    position: absolute;
+    top: 0;
 }
 
 .pipe-bottom {
     background : url('../img/pipe_bottom.png');
     background-size: cover;
+    position: absolute;
+    bottom: 15%;
 }
 
 
