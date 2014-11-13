@@ -1,18 +1,31 @@
 'use strict';
 
 var game;
-var pipes = [];
+var pipes = new Array();
+var length = 0;
+var downId;
+var interId;
+var newPipeId;
 
 window.addEventListener('load', init, false);
 
 function init() {
+    var pipe = function() {
+        this.space = game.pipeSpace;
+        this.width = 69;
+        this.maxHeight = 282;
+        this.minHeight = 138;
+        this.height = Math.floor(Math.random() * (this.maxHeight - this.minHeight)) + this.minHeight;
+        this.left = 600;
+    };
+
     var bird = function() {
-		this.posX = 225;
+        this.posX = 225;
         this.posY = 305;
-        this.width = 34;
-        this.height = 24;
+        this.width = 51;
+        this.height = 36;
         this.showBird();
-	};
+    };
     
     bird.prototype.showBird = function(){
         var div = document.createElement('div');
@@ -27,73 +40,52 @@ function init() {
      bird.prototype.upBird = function(){
         this.posY -= 70;
         document.getElementById('bird').style.top = this.posY +'px';
+
+        bird.checkCollisions();
      };
      
     bird.prototype.downBird = function(){
-        var downId = setInterval(function(){
+        downId = setInterval(function(){
             bird.posY += 1.5;
             document.getElementById('bird').style.top = bird.posY +'px'; 
             if(bird.posY >= game.limitBottom) {
                 clearInterval(downId);
                 document.getElementById('bird').classList.remove('animated-wings');
-                document.getElementById('restart').style.display = 'block';
+                document.getElementById('loose').style.display = 'block';
                 game.started = 'loose';
                 
             }
+
+            bird.checkCollisions();
 		},game.speed);
      };
-    
-    var pipe = function() {
-        this.space = game.pipeSpace;
-        this.width = 69;
-        this.maxHeight = 282;
-        this.minHeight = 138;
-        this.height = Math.floor(Math.random() * (this.maxHeight - this.minHeight)) + this.minHeight;
-        this.left = 600;
-    };
-    
-    pipe.prototype.createPipe = function() {
-        var pipeBottom = document.createElement('div');
-        pipeBottom.classList.add('pipe');
-        pipeBottom.classList.add('pipe-bottom');
-        pipeBottom.style.width = pipe.width +'px'; 
-        pipeBottom.style.height = pipe.height +'px'; 
-        pipeBottom.style.left = pipe.left+'px';
-        document.getElementById('game').appendChild(pipeBottom);
-        
-        var pipeTop = document.createElement('div');
-        pipeTop.classList.add('pipe');
-        pipeTop.classList.add('pipe-top');
-        pipeTop.style.width = pipe.width +'px'; 
-        pipeTop.style.height = (520 - pipe.height - pipe.space) +'px'; 
-        pipeTop.style.left = pipe.left+'px';
-        document.getElementById('game').appendChild(pipeTop);  
-    };
-    
-//    pipe.prototype.showPipe = function() {
-//        var divPipes = document.getElementsByClassName('pipe');
-//        for(var i = 0; i < divPipes.length; i++){
-//            divPipes[i].style.left = pipes[i].left + 'px';
-//        }
-//    };
-    
-//    pipe.prototype.movePipe = function(){
-//        var pipesId = setInterval(function(){
-//            for(var i = 0; i < pipes.length; i++){
-//                pipes[i].left -= 1;
-//            } 
-//            if(bird.posY >= game.limitBottom) {
-//                clearInterval(pipesId);
-//            }
-//		},game.speed);
-//    }
+
+     bird.prototype.checkCollisions = function(){
+        for(var i =0; i < pipes.length; i ++){
+            if((bird.posX + bird.width) > pipes[i].left && bird.posX < (pipes[i].left + bird.width)){
+                if((bird.posY + bird.height) > (540 - pipes[i].height)
+                ||
+                (bird.posY < (540 - pipes[i].space - pipes[i].height))){
+                    clearInterval(downId);
+                    clearInterval(interId);
+                    clearInterval(newPipeId);
+                    
+                    document.getElementById('bird').style.top = game.limitBottom + 'px';
+                    document.getElementById('bird').classList.remove('animated-wings');
+                    document.getElementById('loose').style.display = 'block';
+                    game.started = 'loose';
+
+                }
+            }
+        }
+     };
     
     game = function(speed, pipeSpace){
 		this.points = 0;
         this.speed = speed;
         this.started = 'no';
         this.backgroundPosX = 0;
-        this.limitBottom = 520;
+        this.limitBottom = 508;
         this.limitTop = 0;
         this.pipeSpace = pipeSpace;
 	};
@@ -101,37 +93,70 @@ function init() {
     game.prototype.initGame = function(){
 		bird = new bird();
 	};
+
+    game.prototype.createPipe = function(){
+        var divTop = document.createElement('div');
+        divTop.setAttribute('data-id',pipes.length);
+        divTop.setAttribute('class','pipe-bottom');
+        divTop.style.left = pipes[length].left + 'px';
+        divTop.style.width = pipes[length].width + 'px';
+        divTop.style.height = pipes[length].height + 'px';
+
+        var divBottom = document.createElement('div');
+        divBottom.setAttribute('data-id',pipes.length);
+        divBottom.setAttribute('class','pipe-top');
+        divBottom.style.left = pipes[length].left + 'px';
+        divBottom.style.width = pipes[length].width + 'px';
+        divBottom.style.height = (520 - pipes[length].space - pipes[length].height) + 'px';
+
+        document.getElementById('game').appendChild(divTop);
+        document.getElementById('game').appendChild(divBottom);
+    };
+
+    game.prototype.movePipes = function(){
+        for(var i = 0; i < pipes.length; i++){
+            pipes[i].left -= 2;
+
+            var pipeDivTop = document.getElementsByClassName('pipe-top');
+            var pipeDivBottom = document.getElementsByClassName('pipe-bottom');
+
+            pipeDivTop[i].style.left = pipes[i].left + 'px';
+            pipeDivBottom[i].style.left = pipes[i].left + 'px';
+        }
+    };
     
     game.prototype.playGame = function(){
         document.getElementById('bird').classList.add('animated-wings');
         
-		var interId = setInterval(function(){
+		interId = setInterval(function(){
             game.backgroundPosX -= 2;
-			document.getElementById('ground').style.backgroundPositionX = game.backgroundPosX + 'px'; 
+			document.getElementById('ground').style.backgroundPositionX = game.backgroundPosX + 'px';
+
+            if(pipes.length > 0){
+                game.movePipes();
+            }
+
             if(bird.posY >= game.limitBottom) {
                 clearInterval(interId);
             }
 		},this.speed);
         
-        var newPipesId = setInterval(function(){
-            var newPipe = [];
-            newPipe = new pipe();
-            pipes[pipes.length] = newPipe;
-//            pipes[pipes.length - 1].createPipe();
-//            pipes[pipes.length - 1].movePipe();
-            
-            console.log(pipes);
-            
+        newPipeId = setInterval(function(){
+            length = pipes.length;
+            pipes[length] = new pipe();
+
+            game.createPipe();
+
             if(bird.posY >= game.limitBottom) {
-                clearInterval(newPipesId);
+                clearInterval(newPipeId);
             }
-		},1000);
+        },1500);
 	};
 
 	/**
 	*	On lance la partie
 	**/
-    game = new game(10, 100);
+    game = new game(10, 150);
     game.initGame();
     document.addEventListener('keypress', startGame, false);
     

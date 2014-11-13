@@ -30,17 +30,30 @@ body {
     background : url('../img/bird.png') no-repeat;
     background-size: cover;
     position: absolute;
+
+    z-index: 900;
 }
 
+#loose{
+    width: 172px;
+    height: 228px;
+
+    position: absolute;
+
+    top: 50px;
+    left: calc(240px - 86px);
+
+    display: none;
+    z-index: 1000;
+}
 #restart {
     background : url('../img/restart.png') no-repeat;
     background-size: cover;
     width: 107px;
     height: 37.5px;
     position: absolute;
-    top: 250px;
-    left: 186.5px;
-    display: none;
+    margin-top: 20px;
+    margin-left: 32.5px;
 }
 
 .animated-wings {
@@ -77,17 +90,17 @@ body {
 
 @-webkit-keyframes animBird {
    from { background-position: 0px 0px; }
-   to { background-position: 0px -96px; }
+   to { background-position: 0px -144px; }
 }
 @-moz-keyframes animBird {
    from { background-position: 0px 0px; }
-   to { background-position: 0px -96px; }
+   to { background-position: 0px -144px; }
 }
 @-o-keyframes animBird {
    from { background-position: 0px 0px; }
-   to { background-position: 0px -96px; }
+   to { background-position: 0px -144px; }
 }
 @keyframes animBird {
    from { background-position: 0px 0px; }
-   to { background-position: 0px -96px; }
+   to { background-position: 0px -144px; }
 }
