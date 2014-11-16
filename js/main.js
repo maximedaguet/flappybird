@@ -1,11 +1,11 @@
 'use strict';
 
-var game;
-var pipes = new Array();
-var length = 0;
-var downId;
-var interId;
-var newPipeId;
+var game; 
+var pipes = new Array(); // Tableau dans lequel sont ajoutés les tuyaux
+var length = 0; 
+var downId; // Interval du timer qui fait descendre l'oiseau
+var speedId; // Interval du timer qui fait bouger le sol et les tuyaux
+var newPipeId; // Interval du timer ajoute des nouveaux tuyaux au tableau
 
 window.addEventListener('load', init, false);
 
@@ -29,6 +29,7 @@ function init() {
     };
     
     bird.prototype.showBird = function(){
+        // On attribue des propriétés à l'oiseau et on l'ajoute au DOM dans la balise #game
         var div = document.createElement('div');
         div.id = 'bird';
         document.getElementById('game').appendChild(div);
@@ -39,6 +40,7 @@ function init() {
     };
     
      bird.prototype.upBird = function(){
+        // Gestion du saut de l'oiseau
         this.posY -= 60;
         clearInterval(downId);
 
@@ -50,6 +52,7 @@ function init() {
      };
      
     bird.prototype.downBird = function(){
+        // Gestion de la gravité
         downId = setInterval(function(){
             bird.posY += 1.75;
             document.getElementById('bird').style.top = bird.posY +'px'; 
@@ -60,9 +63,10 @@ function init() {
      };
 
      bird.prototype.checkCollisions = function(){
+        // Vérifie les collisions
         if(bird.posY >= game.limitBottom) {
             clearInterval(downId);
-            clearInterval(interId);
+            clearInterval(speedId);
             clearInterval(newPipeId);
             
             document.getElementById('bird').classList.remove('animated-wings');
@@ -83,7 +87,7 @@ function init() {
                 ||
                 (bird.posY < (540 - pipes[i].space - pipes[i].height))){
                     clearInterval(downId);
-                    clearInterval(interId);
+                    clearInterval(speedId);
                     clearInterval(newPipeId);
 
                     
@@ -105,6 +109,7 @@ function init() {
      };
 
      bird.prototype.checkPoints = function(){
+        // Vérifie les points, met à jour le score et change le fond 
         for(var i =0; i < pipes.length; i ++){
             if(bird.posX == pipes[i].left + pipes[i].width){
                 bird.score++;
@@ -143,21 +148,51 @@ function init() {
     
     game.prototype.initGame = function(){
 		document.getElementById('game').style.backgroundImage = "url(" + game.backgroundImg + ")";
-        bird = new bird();
+        bird = new bird(); // Instancier un nouvel oiseau 
 	};
     
     game.prototype.startGame = function(evt){
-        var keydown = evt.keyCode;
+        var keydown = evt.keyCode; 
+        // Si le jeu n'était pas commencé et qu'on appuye sur la touche espace, on lance le jeu
         if(game.started == 'no' && keydown == 32) {
             game.playGame();
             game.started = 'yes';
             bird.downBird();
+            
+        // Sinon, si le jeu est commencé, on fait sauter l'oiseau
         }else if(game.started == 'yes' && keydown == 32){
             bird.upBird();
         }
     };
+    
+    game.prototype.playGame = function(){
+        // On ajoute une class qui anime les ailes de l'oiseau
+        document.getElementById('bird').classList.add('animated-wings');
+        // On supprime le texte d'aide de début de partie
+        document.getElementById('pressSpace').style.display = 'none';        
+        
+        // On lance un timer qui en fonction de la vitesse choisie, anime le sol et les tuyaux si il y en a
+		speedId = setInterval(function(){
+            game.backgroundPosX -= 2;
+			document.getElementById('ground').style.backgroundPositionX = game.backgroundPosX + 'px';
+
+            if(pipes.length > 0){
+                game.movePipes();
+            }
+		},this.speed);
+        
+        // On lance un timer qui ajoute un objet tuyau au tableau des tuyaux toutes les 1750ms
+        newPipeId = setInterval(function(){
+            length = pipes.length;
+            pipes[length] = new pipe();
+
+            game.createPipe();
+        },1750);
+	};
 
     game.prototype.createPipe = function(){
+        // Défini les propriétés des tuyaux haut et bas et les ajoutes au DOM dans la balise #game
+        
         var divTop = document.createElement('div');
         divTop.setAttribute('data-id',pipes.length);
         divTop.setAttribute('class','pipe-bottom');
@@ -177,6 +212,7 @@ function init() {
     };
 
     game.prototype.movePipes = function(){
+        // Gestion du déplacement des tuyaux
         for(var i = 0; i < pipes.length; i++){
             pipes[i].left -= 2;
 
@@ -187,33 +223,12 @@ function init() {
             pipeDivBottom[i].style.left = pipes[i].left + 'px';
         }
     };
-    
-    game.prototype.playGame = function(){
-        document.getElementById('bird').classList.add('animated-wings');
-        document.getElementById('pressSpace').style.display = 'none';        
-        
-		interId = setInterval(function(){
-            game.backgroundPosX -= 2;
-			document.getElementById('ground').style.backgroundPositionX = game.backgroundPosX + 'px';
-
-            if(pipes.length > 0){
-                game.movePipes();
-            }
-		},this.speed);
-        
-        newPipeId = setInterval(function(){
-            length = pipes.length;
-            pipes[length] = new pipe();
-
-            game.createPipe();
-        },1750);
-	};
 
 	/**
 	*	On lance la partie
 	**/
     
-    game = new game(10, 150);
+    var game = new game(10, 150); // On créé une partie avec une vitesse de 10 et Un espace tuyaux de 150
     game.initGame();
     document.addEventListener('keydown', game.startGame, false);
 
