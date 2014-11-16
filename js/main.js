@@ -110,6 +110,22 @@ function init() {
                 bird.score++;
 
                 document.getElementById('score').innerHTML = bird.score;
+                
+                var bg = bird.score;
+                switch (true) {
+                    case (bg > 4 && bg < 10):
+                        document.getElementById('game').style.backgroundImage = "url(img/background2.png)";
+                        break;
+                    case (bg > 9 && bg < 15):
+                        document.getElementById('game').style.backgroundImage = "url(img/background3.png)";
+                        break;
+                    case (bg > 14):
+                        document.getElementById('game').style.backgroundImage = "url(img/background4.png)";
+                        break;
+                    default:
+                        document.getElementById('game').style.backgroundImage = "url(img/background.png)";
+                        break;
+                }
             }
         }
      };
@@ -118,6 +134,7 @@ function init() {
 		this.points = 0;
         this.speed = speed;
         this.started = 'no';
+        this.backgroundImg = 'img/background.png';
         this.backgroundPosX = 0;
         this.limitBottom = 508;
         this.limitTop = 0;
@@ -125,7 +142,8 @@ function init() {
 	};
     
     game.prototype.initGame = function(){
-		bird = new bird();
+		document.getElementById('game').style.backgroundImage = "url(" + game.backgroundImg + ")";
+        bird = new bird();
 	};
     
     game.prototype.startGame = function(evt){
