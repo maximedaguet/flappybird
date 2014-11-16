@@ -107,7 +107,7 @@ function init() {
         }
      };
     
-    game = function(speed, pipeSpace){
+    var game = function(speed, pipeSpace){
 		this.points = 0;
         this.speed = speed;
         this.started = 'no';
@@ -120,6 +120,17 @@ function init() {
     game.prototype.initGame = function(){
 		bird = new bird();
 	};
+    
+    game.prototype.startGame = function(evt){
+        var keydown = evt.keyCode;
+        if(game.started == 'no' && keydown == 32) {
+            game.playGame();
+            game.started = 'yes';
+            bird.downBird();
+        }else if(game.started == 'yes' && keydown == 32){
+            bird.upBird();
+        }
+    };
 
     game.prototype.createPipe = function(){
         var divTop = document.createElement('div');
@@ -176,20 +187,10 @@ function init() {
 	/**
 	*	On lance la partie
 	**/
+    
     game = new game(10, 150);
     game.initGame();
-    document.addEventListener('keydown', startGame, false);
-    
-    function startGame(evt) {
-        var keydown = evt.keyCode;
-        if(game.started == 'no' && keydown == 32) {
-            game.playGame();
-            game.started = 'yes';
-            bird.downBird();
-        }else if(game.started == 'yes' && keydown == 32){
-            bird.upBird();
-        }
-    };
+    document.addEventListener('keydown', game.startGame, false);
 
     var createCookie = function(name, value, days) {
         var expires;
