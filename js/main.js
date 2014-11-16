@@ -68,6 +68,13 @@ function init() {
             document.getElementById('bird').classList.remove('animated-wings');
             document.getElementById('loose').style.display = 'block';
             game.started = 'loose';
+
+            if(getCookie('bestscore') < bird.score){
+                createCookie('bestscore',bird.score,365);
+            }
+
+            document.getElementById('bestscore').innerHTML = getCookie('bestscore');
+            document.getElementById('bestscore').style.display = 'block';
         }
 
         for(var i =0; i < pipes.length; i ++){
