@@ -10,11 +10,20 @@
         <link type="text/css" rel="stylesheet" href="./css/style.css"/>
 
         <title>Flappy bird</title>
+        <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
     </head>
 
     <body>
         <div id="game">
+            <div id="score">
+                0
+            </div>
+            <div id="pressSpace">Press space to start</div>
+            <div id="bestscore">
+                0
+            </div>
             <div id="loose">
                 <img src="img/score.png"/>
                 <a href="index.html" id="restart"></a>

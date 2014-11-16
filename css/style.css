@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "Flappy";
+  src: url('fonts/flappyfont.ttf');
+}
+
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -32,6 +37,49 @@ body {
     position: absolute;
 
     z-index: 900;
+}
+#score{
+    position: absolute;
+    top: 125px;
+    width: 480px;
+
+    font-family: Flappy;
+    text-shadow: 2px 2px 0px rgba(0,0,0,1);
+    font-size: 50px;
+    text-align: center;
+
+    color: white;
+
+    z-index: 1100;
+}
+#pressSpace{
+    position: absolute;
+    top: 175px;
+    width: 480px;
+
+    font-family: Flappy;
+    text-shadow: 2px 2px 0px rgba(0,0,0,1);
+    font-size: 30px;
+    text-align: center;
+
+    color: white;
+
+    z-index: 1100;
+}
+#bestscore{
+    position: absolute;
+    top: 210px;
+    width: 480px;
+
+    font-family: Flappy;
+    text-shadow: 2px 2px 0px rgba(0,0,0,1);
+    font-size: 50px;
+    text-align: center;
+
+    color: white;
+
+    z-index: 1100;
+    display: none;
 }
 
 #loose{

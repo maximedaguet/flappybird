@@ -13,8 +13,8 @@ function init() {
     var pipe = function() {
         this.space = game.pipeSpace;
         this.width = 69;
-        this.maxHeight = 282;
-        this.minHeight = 138;
+        this.maxHeight = 340;
+        this.minHeight = 50;
         this.height = Math.floor(Math.random() * (this.maxHeight - this.minHeight)) + this.minHeight;
         this.left = 600;
     };
@@ -24,6 +24,7 @@ function init() {
         this.posY = 305;
         this.width = 51;
         this.height = 36;
+        this.score = 0;
         this.showBird();
     };
     
@@ -38,29 +39,37 @@ function init() {
     };
     
      bird.prototype.upBird = function(){
-        this.posY -= 70;
+        this.posY -= 60;
+        clearInterval(downId);
+
         document.getElementById('bird').style.top = this.posY +'px';
 
         bird.checkCollisions();
+        bird.checkPoints();
+        bird.downBird();
      };
      
     bird.prototype.downBird = function(){
         downId = setInterval(function(){
-            bird.posY += 1.5;
+            bird.posY += 1.75;
             document.getElementById('bird').style.top = bird.posY +'px'; 
-            if(bird.posY >= game.limitBottom) {
-                clearInterval(downId);
-                document.getElementById('bird').classList.remove('animated-wings');
-                document.getElementById('loose').style.display = 'block';
-                game.started = 'loose';
-                
-            }
 
             bird.checkCollisions();
+            bird.checkPoints();
 		},game.speed);
      };
 
      bird.prototype.checkCollisions = function(){
+        if(bird.posY >= game.limitBottom) {
+            clearInterval(downId);
+            clearInterval(interId);
+            clearInterval(newPipeId);
+            
+            document.getElementById('bird').classList.remove('animated-wings');
+            document.getElementById('loose').style.display = 'block';
+            game.started = 'loose';
+        }
+
         for(var i =0; i < pipes.length; i ++){
             if((bird.posX + bird.width) > pipes[i].left && bird.posX < (pipes[i].left + bird.width)){
                 if((bird.posY + bird.height) > (540 - pipes[i].height)
@@ -69,13 +78,31 @@ function init() {
                     clearInterval(downId);
                     clearInterval(interId);
                     clearInterval(newPipeId);
+
                     
-                    document.getElementById('bird').style.top = game.limitBottom + 'px';
+                    $('#bird').animate({top: game.limitBottom + 'px'},600);
+                    //document.getElementById('bird').style.top = game.limitBottom + 'px';
                     document.getElementById('bird').classList.remove('animated-wings');
                     document.getElementById('loose').style.display = 'block';
                     game.started = 'loose';
 
+                    if(getCookie('bestscore') < bird.score){
+                        createCookie('bestscore',bird.score,365);
+                    }
+
+                    document.getElementById('bestscore').innerHTML = getCookie('bestscore');
+                    document.getElementById('bestscore').style.display = 'block';
                 }
+            }
+        }
+     };
+
+     bird.prototype.checkPoints = function(){
+        for(var i =0; i < pipes.length; i ++){
+            if(bird.posX == pipes[i].left + pipes[i].width){
+                bird.score++;
+
+                document.getElementById('score').innerHTML = bird.score;
             }
         }
      };
@@ -127,6 +154,7 @@ function init() {
     
     game.prototype.playGame = function(){
         document.getElementById('bird').classList.add('animated-wings');
+        document.getElementById('pressSpace').style.display = 'none';        
         
 		interId = setInterval(function(){
             game.backgroundPosX -= 2;
@@ -135,10 +163,6 @@ function init() {
             if(pipes.length > 0){
                 game.movePipes();
             }
-
-            if(bird.posY >= game.limitBottom) {
-                clearInterval(interId);
-            }
 		},this.speed);
         
         newPipeId = setInterval(function(){
@@ -146,11 +170,7 @@ function init() {
             pipes[length] = new pipe();
 
             game.createPipe();
-
-            if(bird.posY >= game.limitBottom) {
-                clearInterval(newPipeId);
-            }
-        },1500);
+        },1750);
 	};
 
 	/**
@@ -158,7 +178,7 @@ function init() {
 	**/
     game = new game(10, 150);
     game.initGame();
-    document.addEventListener('keypress', startGame, false);
+    document.addEventListener('keydown', startGame, false);
     
     function startGame(evt) {
         var keydown = evt.keyCode;
@@ -170,5 +190,32 @@ function init() {
             bird.upBird();
         }
     };
-    
+
+    var createCookie = function(name, value, days) {
+        var expires;
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        }
+        else {
+            expires = "";
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    }
+
+    function getCookie(c_name) {
+        if (document.cookie.length > 0) {
+            var c_start = document.cookie.indexOf(c_name + "=");
+            if (c_start != -1) {
+                c_start = c_start + c_name.length + 1;
+                var c_end = document.cookie.indexOf(";", c_start);
+                if (c_end == -1) {
+                    c_end = document.cookie.length;
+                }
+                return unescape(document.cookie.substring(c_start, c_end));
+            }
+        }
+        return "";
+    }    
 }
