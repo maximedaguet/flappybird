@@ -25,6 +25,8 @@ function init() {
         this.width = 51;
         this.height = 36;
         this.score = 0;
+        this.up = 0;
+        this.rotation = 1;
         this.showBird();
     };
     
@@ -41,21 +43,43 @@ function init() {
     
      bird.prototype.upBird = function(){
         // Gestion du saut de l'oiseau
-        this.posY -= 60;
-        clearInterval(downId);
+        if (this.up == 0){
+            clearInterval(downId);
+            this.posY -= 60;
+            bird.rotation = -20;
+            $( "#bird" ).animate({
+                top: this.posY,
+                '-webkit-transform' : 'rotate('+ bird.rotation +'deg)',
+                 '-moz-transform' : 'rotate('+ bird.rotation +'deg)',
+                 '-ms-transform' : 'rotate('+ bird.rotation +'deg)',
+                 'transform' : 'rotate('+ bird.rotation +'deg)'
+            }, 100, function() {
+                this.up = 1;
+                bird.checkCollisions();
+                bird.checkPoints();
+                bird.downBird();
+            });
+        }
+        //document.getElementById('bird').style.top = this.posY +'px';
 
-        document.getElementById('bird').style.top = this.posY +'px';
-
-        bird.checkCollisions();
-        bird.checkPoints();
-        bird.downBird();
+        //bird.checkCollisions();
+        //bird.checkPoints();
+        //bird.downBird();
      };
      
     bird.prototype.downBird = function(){
         // Gestion de la gravité
         downId = setInterval(function(){
             bird.posY += 1.75;
+            bird.rotation += 1;
+            if (bird.rotation >= 90){
+                bird.rotation = 90;
+            }
             document.getElementById('bird').style.top = bird.posY +'px'; 
+            $("#bird").css({'-webkit-transform' : 'rotate('+ bird.rotation +'deg)',
+                 '-moz-transform' : 'rotate('+ bird.rotation +'deg)',
+                 '-ms-transform' : 'rotate('+ bird.rotation +'deg)',
+                 'transform' : 'rotate('+ bird.rotation +'deg)'});
 
             bird.checkCollisions();
             bird.checkPoints();
